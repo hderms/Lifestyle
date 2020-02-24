@@ -23,7 +23,7 @@ use crate::board::{GameboardController, GameboardViewSettings, GameboardView, Bo
 fn main() {
     let opengl = OpenGL::V3_2;
 
-    let settings = WindowSettings::new("Lifestyle", [1080; 2])
+    let settings = WindowSettings::new("Lifestyle", [1920, 1080])
         .graphics_api(opengl)
         .exit_on_esc(true);
 
