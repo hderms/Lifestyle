@@ -1,6 +1,6 @@
 use array2d::Array2D;
-use graphics::{Context, Graphics};
 use graphics::types::Color;
+use graphics::{Context, Graphics};
 use piston::input::{GenericEvent, UpdateArgs};
 use rand;
 use rand::Rng;
