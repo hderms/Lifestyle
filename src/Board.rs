@@ -77,21 +77,6 @@ impl Board {
         }
         return next;
     }
-
-    pub fn print(&self) -> () {
-        let n = self;
-        for row in n.array.rows_iter() {
-            for el in row {
-                print!(" ");
-                if el.on {
-                    print!("X");
-                } else {
-                    print!("_");
-                }
-            }
-            print!("\n");
-        }
-    }
 }
 
 #[derive(Default, Clone, Debug)]
