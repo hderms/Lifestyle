@@ -386,6 +386,7 @@ name = "gol"
 version = "0.1.0"
 dependencies = [
  "array2d 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston 0.49.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston2d-graphics 0.36.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "piston2d-opengl_graphics 0.72.0 (registry+https://github.com/rust-lang/crates.io-index)",
