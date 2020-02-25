@@ -10,6 +10,28 @@ use graphics::{Context, Graphics};
 use piston::input::{GenericEvent, UpdateArgs};
 
 
+
+const NEIGHBOR_SPACES: [i32; 3] = [-1, 0, 1];
+
+ lazy_static! {
+     static ref NEIGHBOR_SPACES_CROSS: Vec<(i32, i32)> = {
+                let mut product: Vec<(i32, i32)> = vec!();
+
+
+                for up in NEIGHBOR_SPACES.iter() {
+                    for left in NEIGHBOR_SPACES.iter() {
+
+                        if (*left == 0) && (*up == 0)  {
+                            continue;
+                        }
+
+                        product.push((*up, *left));
+                    }
+                }
+                return product;
+
+    };
+}
 #[derive(Debug, Clone)]
 pub struct Board {
     array: Array2D<Cell>

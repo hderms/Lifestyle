@@ -1,3 +1,5 @@
+#[macro_use]
+extern crate lazy_static;
 mod board;
 extern crate piston;
 extern crate glutin_window;
