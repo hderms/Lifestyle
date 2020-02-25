@@ -215,13 +215,11 @@ impl GameboardView {
         board: &Board,
         settings: &GameboardViewSettings,
     ) {
-        for row in board.array.rows_iter() {
-            for el in row {
-                if el.on {
-                    GameboardView::draw_cell(c, g, settings, el.col, el.row, settings.dead_color);
-                } else {
-                    GameboardView::draw_cell(c, g, settings, el.col, el.row, settings.live_color);
-                }
+        for el in board.array.elements_column_major_iter() {
+            if el.on {
+                GameboardView::draw_cell(c, g, settings, el.col, el.row, settings.dead_color);
+            } else {
+                GameboardView::draw_cell(c, g, settings, el.col, el.row, settings.live_color);
             }
         }
     }
