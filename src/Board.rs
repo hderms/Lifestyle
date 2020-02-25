@@ -1,11 +1,9 @@
 use array2d::Array2D;
+use graphics::{Context, Graphics};
+use graphics::types::Color;
+use piston::input::{GenericEvent, UpdateArgs};
 use rand;
 use rand::Rng;
-
-use graphics::types::Color;
-use graphics::{Context, Graphics};
-
-use piston::input::{GenericEvent, UpdateArgs};
 
 const NEIGHBOR_SPACES: [i32; 3] = [-1, 0, 1];
 
@@ -141,7 +139,7 @@ impl GameboardController {
     }
 
     /// Handles events.
-    pub fn event<E: GenericEvent>(&mut self, e: &E) {}
+    pub fn event<E: GenericEvent>(&mut self, _e: &E) {}
     pub fn update(&mut self, args: &UpdateArgs) {
         // Rotate 2 radians per second.
         self.dt += args.dt;
@@ -197,10 +195,12 @@ impl GameboardView {
         y: usize,
         color: Color,
     ) {
-        use graphics::{Line, Rectangle};
+        use graphics::Rectangle;
 
         let cell_size = settings.size;
+
         let pos = [x as f64 * cell_size, y as f64 * cell_size];
+
         let cell_rect = [
             settings.position[0] + pos[0],
             settings.position[1] + pos[1],
@@ -225,7 +225,7 @@ impl GameboardView {
     }
     /// Draw gameboard.
     pub fn draw<G: Graphics>(&self, controller: &GameboardController, c: &Context, g: &mut G) {
-        use graphics::{Line, Rectangle};
+        use graphics::Rectangle;
 
         let ref settings = self.settings;
         let board_rect = [

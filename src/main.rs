@@ -10,8 +10,8 @@ use glutin_window::GlutinWindow;
 
 use piston::window::WindowSettings;
 
-use piston::event_loop::{EventLoop, EventSettings, Events};
-use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
+use piston::event_loop::{EventSettings, Events};
+use piston::input::{RenderEvent, UpdateEvent};
 
 use crate::board::{
     Board, GameboardController, GameboardControllerSettings, GameboardView, GameboardViewSettings,
