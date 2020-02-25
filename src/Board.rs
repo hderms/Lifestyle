@@ -48,8 +48,8 @@ impl Board {
                 let random = rng.gen::<bool>();
                 let mut el = array.get_mut(row, col).unwrap();
                 el.on = random;
-                el.x = row;
-                el.y = col;
+                el.col = row;
+                el.row = col;
             }
         }
 
@@ -57,45 +57,39 @@ impl Board {
     }
     pub fn next(&self) -> Board {
         let old_board = self;
-        let mut nex = self.clone();
-        let neighbor_spaces: Vec<i32> = vec![-1, 0, 1];
-        for col in 0..old_board.array.column_len() {
-            for row in 0..old_board.array.row_len() {
-                let mut tally = 0;
-                for up in neighbor_spaces.iter() {
-                    for left in neighbor_spaces.iter() {
-                        if *up == (0 as i32)  && *left == (0 as i32) {
-                            continue;
-                        }
-                        let neighbor_col = ((col as i32) + *up) as usize;
-                        let neighbor_row = ((row as i32) + *left) as usize;
-                        let neighbor: Option<&Cell> = old_board.array.get(neighbor_row,
-                                                                         neighbor_col);
+        let mut next = self.clone();
 
-                        let neighbor_value: usize = match neighbor {
-                            Some(Cell { on: true, x: _, y: _ }) => 1,
-                            Some(Cell { on: false, x: _, y: _ }) => 0,
-                            None => 0,
-                        };
+        for el in old_board.array.elements_column_major_iter() {
+            let mut tally = 0;
+            let col = el.col;
+            let row = el.row;
 
-                        tally += neighbor_value;
-                    }
-                }
-                let old_cell = self.array.get(col, row).unwrap();
-                let pair: (bool, usize) = (old_cell.on, tally);
+            for (up, left) in NEIGHBOR_SPACES_CROSS.iter() {
+                let neighbor_col = ((col as i32) + *up) as usize;
+                let neighbor_row = ((row as i32) + *left) as usize;
 
-                let on = match pair {
-                    (true, 2 ) => true,
-                    (true, 3 ) => true,
-                    (false, 3) => true,
-                    _ => false,
-                };
+                let neighbor = old_board
+                    .array
+                    .get(neighbor_row, neighbor_col);
 
-                let cell = nex.array.get_mut(col, row).unwrap();
-                cell.on = on;
+                tally +=  neighbor
+                    .map(|c| if c.on {1} else {0})
+                    .unwrap_or(0);
             }
+            let old_cell = self.array.get(col, row).unwrap();
+            let pair: (bool, usize) = (old_cell.on, tally);
+
+            let on = match pair {
+                (true, 2) => true,
+                (true, 3) => true,
+                (false, 3) => true,
+                _ => false,
+            };
+
+            let cell = next.array.get_mut(col, row).unwrap();
+            cell.on = on;
         }
-        return nex;
+        return next;
     }
 
     pub fn print(&self) -> () {
@@ -117,12 +111,12 @@ impl Board {
 #[derive(Default, Clone, Debug)]
 pub struct Cell {
     on: bool,
-    x: usize,
-    y: usize
+    col: usize,
+    row: usize
 }
 impl Cell {
     fn new(x: usize, y: usize) -> Cell {
-        return Cell{on: false, x, y};
+        return Cell{on: false, col: x, row: y };
     }
 }
 
@@ -131,14 +125,27 @@ impl Cell {
 pub struct GameboardController {
     /// Stores the gameboard state.
     pub gameboard: Board,
-    dt: f64
+    settings: GameboardControllerSettings,
+    dt: f64,
+
+}
+pub struct GameboardControllerSettings {
+    pub tick_in_seconds: f64
+}
+impl GameboardControllerSettings {
+    pub fn new() -> GameboardControllerSettings {
+        GameboardControllerSettings{
+            tick_in_seconds: 0.001
+        }
+    }
 }
 
 impl GameboardController {
     /// Creates a new gameboard controller.
-    pub fn new(gameboard: Board) -> GameboardController {
+    pub fn new(gameboard: Board, settings: GameboardControllerSettings) -> GameboardController {
         GameboardController {
-            gameboard: gameboard,
+            gameboard,
+            settings,
             dt: 0.0
         }
     }
@@ -148,11 +155,11 @@ impl GameboardController {
 
     }
     pub fn update(&mut self, args: &UpdateArgs) {
-// Rotate 2 radians per second.
+        // Rotate 2 radians per second.
         self.dt += args.dt;
-        if self.dt > 0.01 {
+        if self.dt > self.settings.tick_in_seconds {
             self.gameboard = self.gameboard.next();
-            self.dt -= 0.01;
+            self.dt -= self.settings.tick_in_seconds;
         }
     }
 
@@ -220,9 +227,9 @@ impl GameboardView {
         for row in board.array.rows_iter() {
             for el in row {
                 if el.on {
-                    GameboardView::draw_cell(c, g, settings, el.x, el.y, settings.dead_color);
+                    GameboardView::draw_cell(c, g, settings, el.col, el.row, settings.dead_color);
                 } else {
-                    GameboardView::draw_cell(c, g, settings, el.x, el.y, settings.live_color);
+                    GameboardView::draw_cell(c, g, settings, el.col, el.row, settings.live_color);
                 }
             }
         }
@@ -237,14 +244,9 @@ impl GameboardView {
             settings.size, settings.size,
         ];
 
-// Draw board background.
         Rectangle::new(settings.background_color)
             .draw(board_rect, &c.draw_state, c.transform, g);
 
         GameboardView::draw_board(c, g, &controller.gameboard, settings);
-
-
-
-
     }
 }

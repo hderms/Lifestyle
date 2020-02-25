@@ -15,7 +15,8 @@ use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
 
 
 use opengl_graphics::{OpenGL, GlGraphics};
-use crate::board::{GameboardController, GameboardViewSettings, GameboardView, Board};
+use crate::board::{GameboardController, GameboardControllerSettings, GameboardViewSettings,
+                   GameboardView, Board};
 
 
 
@@ -35,7 +36,9 @@ fn main() {
     let mut events = Events::new(EventSettings::new());
 
     let gameboard = Board::new();
-    let mut gameboard_controller = GameboardController::new(gameboard);
+    let gameboard_controller_settings = GameboardControllerSettings::new();
+    let mut gameboard_controller = GameboardController::new(gameboard,
+                                                            gameboard_controller_settings);
     let gameboard_view_settings = GameboardViewSettings::new();
     let gameboard_view = GameboardView::new(gameboard_view_settings);
 
