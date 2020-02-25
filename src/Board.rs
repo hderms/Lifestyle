@@ -2,39 +2,32 @@ use array2d::Array2D;
 use rand;
 use rand::Rng;
 
-
-
 use graphics::types::Color;
 use graphics::{Context, Graphics};
 
 use piston::input::{GenericEvent, UpdateArgs};
 
-
-
 const NEIGHBOR_SPACES: [i32; 3] = [-1, 0, 1];
 
- lazy_static! {
-     static ref NEIGHBOR_SPACES_CROSS: Vec<(i32, i32)> = {
-                let mut product: Vec<(i32, i32)> = vec!();
+lazy_static! {
+    static ref NEIGHBOR_SPACES_CROSS: Vec<(i32, i32)> = {
+        let mut product: Vec<(i32, i32)> = vec![];
 
-
-                for up in NEIGHBOR_SPACES.iter() {
-                    for left in NEIGHBOR_SPACES.iter() {
-
-                        if (*left == 0) && (*up == 0)  {
-                            continue;
-                        }
-
-                        product.push((*up, *left));
-                    }
+        for up in NEIGHBOR_SPACES.iter() {
+            for left in NEIGHBOR_SPACES.iter() {
+                if (*left == 0) && (*up == 0) {
+                    continue;
                 }
-                return product;
 
+                product.push((*up, *left));
+            }
+        }
+        return product;
     };
 }
 #[derive(Debug, Clone)]
 pub struct Board {
-    array: Array2D<Cell>
+    array: Array2D<Cell>,
 }
 
 impl Board {
@@ -44,7 +37,6 @@ impl Board {
         let mut array = Array2D::filled_with(Cell::new(0, 0), 100, 100);
         for col in 0..array.column_len() {
             for row in 0..array.row_len() {
-
                 let random = rng.gen::<bool>();
                 let mut el = array.get_mut(row, col).unwrap();
                 el.on = random;
@@ -68,13 +60,9 @@ impl Board {
                 let neighbor_col = ((col as i32) + *up) as usize;
                 let neighbor_row = ((row as i32) + *left) as usize;
 
-                let neighbor = old_board
-                    .array
-                    .get(neighbor_row, neighbor_col);
+                let neighbor = old_board.array.get(neighbor_row, neighbor_col);
 
-                tally +=  neighbor
-                    .map(|c| if c.on {1} else {0})
-                    .unwrap_or(0);
+                tally += neighbor.map(|c| if c.on { 1 } else { 0 }).unwrap_or(0);
             }
             let old_cell = self.array.get(col, row).unwrap();
             let pair: (bool, usize) = (old_cell.on, tally);
@@ -112,14 +100,17 @@ impl Board {
 pub struct Cell {
     on: bool,
     col: usize,
-    row: usize
+    row: usize,
 }
 impl Cell {
     fn new(x: usize, y: usize) -> Cell {
-        return Cell{on: false, col: x, row: y };
+        return Cell {
+            on: false,
+            col: x,
+            row: y,
+        };
     }
 }
-
 
 /// Handles events for Sudoku game.
 pub struct GameboardController {
@@ -127,15 +118,14 @@ pub struct GameboardController {
     pub gameboard: Board,
     settings: GameboardControllerSettings,
     dt: f64,
-
 }
 pub struct GameboardControllerSettings {
-    pub tick_in_seconds: f64
+    pub tick_in_seconds: f64,
 }
 impl GameboardControllerSettings {
     pub fn new() -> GameboardControllerSettings {
-        GameboardControllerSettings{
-            tick_in_seconds: 0.001
+        GameboardControllerSettings {
+            tick_in_seconds: 0.001,
         }
     }
 }
@@ -146,14 +136,12 @@ impl GameboardController {
         GameboardController {
             gameboard,
             settings,
-            dt: 0.0
+            dt: 0.0,
         }
     }
 
     /// Handles events.
-    pub fn event<E: GenericEvent>(&mut self, e: &E) {
-
-    }
+    pub fn event<E: GenericEvent>(&mut self, e: &E) {}
     pub fn update(&mut self, args: &UpdateArgs) {
         // Rotate 2 radians per second.
         self.dt += args.dt;
@@ -162,9 +150,7 @@ impl GameboardController {
             self.dt -= self.settings.tick_in_seconds;
         }
     }
-
 }
-
 
 /// Stores gameboard view settings.
 pub struct GameboardViewSettings {
@@ -200,30 +186,35 @@ pub struct GameboardView {
 impl GameboardView {
     /// Creates a new gameboard view.
     pub fn new(settings: GameboardViewSettings) -> GameboardView {
-        GameboardView {
-            settings,
-        }
+        GameboardView { settings }
     }
 
-    fn draw_cell<G: Graphics>(c: &Context, g: &mut G, settings: &GameboardViewSettings, x: usize, y:
-    usize, color: Color) {
+    fn draw_cell<G: Graphics>(
+        c: &Context,
+        g: &mut G,
+        settings: &GameboardViewSettings,
+        x: usize,
+        y: usize,
+        color: Color,
+    ) {
         use graphics::{Line, Rectangle};
 
         let cell_size = settings.size;
         let pos = [x as f64 * cell_size, y as f64 * cell_size];
         let cell_rect = [
-            settings.position[0] + pos[0], settings.position[1] + pos[1],
-            cell_size, cell_size
+            settings.position[0] + pos[0],
+            settings.position[1] + pos[1],
+            cell_size,
+            cell_size,
         ];
-        Rectangle::new(color)
-            .draw(cell_rect, &c.draw_state, c.transform, g);
-
+        Rectangle::new(color).draw(cell_rect, &c.draw_state, c.transform, g);
     }
-    fn draw_board<G: Graphics>(c: &Context,
-                               g: &mut G,
-                               board: &Board,
-                               settings: &GameboardViewSettings) {
-
+    fn draw_board<G: Graphics>(
+        c: &Context,
+        g: &mut G,
+        board: &Board,
+        settings: &GameboardViewSettings,
+    ) {
         for row in board.array.rows_iter() {
             for el in row {
                 if el.on {
@@ -240,12 +231,13 @@ impl GameboardView {
 
         let ref settings = self.settings;
         let board_rect = [
-            settings.position[0], settings.position[1],
-            settings.size, settings.size,
+            settings.position[0],
+            settings.position[1],
+            settings.size,
+            settings.size,
         ];
 
-        Rectangle::new(settings.background_color)
-            .draw(board_rect, &c.draw_state, c.transform, g);
+        Rectangle::new(settings.background_color).draw(board_rect, &c.draw_state, c.transform, g);
 
         GameboardView::draw_board(c, g, &controller.gameboard, settings);
     }
